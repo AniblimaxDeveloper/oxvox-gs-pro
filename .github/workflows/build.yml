@@ -5,7 +5,6 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 
-# Tambahan izin agar bisa upload Release
 permissions:
   contents: write
 
@@ -14,16 +13,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+    
     - name: Set up JDK 17
       uses: actions/setup-java@v3
       with:
         java-version: '17'
         distribution: 'temurin'
         cache: gradle
+
+    - name: Create local.properties from Secrets
+      run: |
+        echo "sdk.dir=/usr/local/lib/android/sdk" > local.properties
+        echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" >> local.properties
+        echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> local.properties
+
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+
     - name: Build with Gradle
       run: ./gradlew assembleDebug
+
     - name: Create Release
       uses: softprops/action-gh-release@v1
       if: github.ref == 'refs/heads/main'

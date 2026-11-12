@@ -12,84 +12,69 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.oxvox.app.data.AuthViewModel
 import com.oxvox.app.ui.theme.*
 
 @Composable
 fun LoginScreen(
     onLoginSuccess: () -> Unit,
-    onNavigateToRegister: () -> Unit
+    onNavigateToRegister: () -> Unit,
+    viewModel: AuthViewModel = viewModel()
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var isLoading by remember { mutableStateOf(false) }
+    
+    val isLoading by viewModel.isLoading.collectAsState()
+    val error by viewModel.errorMessage.collectAsState()
+    val isSuccess by viewModel.isSuccess.collectAsState()
+
+    LaunchedEffect(isSuccess) {
+        if (isSuccess) {
+            viewModel.resetState()
+            onLoginSuccess()
+        }
+    }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(VillainBlack)
-            .padding(24.dp),
+        modifier = Modifier.fillMaxSize().background(VillainBlack).padding(24.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = "OXVOX LOGIN",
-            color = NeonCyan,
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 4.sp
-        )
+        Text("OXVOX LOGIN", color = NeonCyan, fontSize = 32.sp, fontWeight = FontWeight.Bold, letterSpacing = 4.sp)
         Spacer(modifier = Modifier.height(32.dp))
 
+        if (error != null) {
+            Text(text = error!!, color = BloodRed, fontSize = 14.sp)
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
         OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email") },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = NeonCyan,
-                unfocusedBorderColor = TextGray,
-                focusedLabelColor = NeonCyan,
-                unfocusedLabelColor = TextGray,
-                focusedTextColor = TextWhite,
-                unfocusedTextColor = TextWhite
-            ),
-            modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+            value = email, onValueChange = { email = it }, label = { Text("Email") },
+            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = NeonCyan, unfocusedBorderColor = TextGray, focusedTextColor = TextWhite, unfocusedTextColor = TextWhite),
+            modifier = Modifier.fillMaxWidth(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
         )
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("Password") },
+            value = password, onValueChange = { password = it }, label = { Text("Password") },
             visualTransformation = PasswordVisualTransformation(),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = NeonCyan,
-                unfocusedBorderColor = TextGray,
-                focusedLabelColor = NeonCyan,
-                unfocusedLabelColor = TextGray,
-                focusedTextColor = TextWhite,
-                unfocusedTextColor = TextWhite
-            ),
+            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = NeonCyan, unfocusedBorderColor = TextGray, focusedTextColor = TextWhite, unfocusedTextColor = TextWhite),
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(
-            onClick = {
-                if (email.isNotBlank() && password.isNotBlank()) {
-                    isLoading = true
-                    // Simulasi loading sebelum masuk dashboard
-                    onLoginSuccess()
-                }
-            },
+            onClick = { if (email.isNotBlank() && password.isNotBlank()) viewModel.login(email, password) },
             modifier = Modifier.fillMaxWidth().height(50.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = ComicPurple)
+            colors = ButtonDefaults.buttonColors(containerColor = ComicPurple),
+            enabled = !isLoading
         ) {
-            Text("ACCESS COMMAND CENTER", color = TextWhite, fontWeight = FontWeight.Bold)
+            if (isLoading) CircularProgressIndicator(color = TextWhite, modifier = Modifier.size(24.dp))
+            else Text("ACCESS COMMAND CENTER", color = TextWhite, fontWeight = FontWeight.Bold)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-
         TextButton(onClick = onNavigateToRegister) {
             Text("Don't have an account? Register", color = NeonCyan)
         }
