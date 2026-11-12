@@ -24,6 +24,7 @@ import com.oxvox.app.ui.theme.*
 fun DashboardScreen(viewModel: DeviceViewModel = viewModel()) {
     val devices by viewModel.devices.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+    val errorMsg by viewModel.errorMsg.collectAsState()
 
     Scaffold(
         topBar = {
@@ -52,7 +53,15 @@ fun DashboardScreen(viewModel: DeviceViewModel = viewModel()) {
                 CircularProgressIndicator(color = NeonCyan, modifier = Modifier.align(Alignment.CenterHorizontally))
             }
 
-            if (devices.isEmpty() && !isLoading) {
+            if (errorMsg != null) {
+                Text(
+                    text = errorMsg!!,
+                    color = BloodRed,
+                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 16.dp)
+                )
+            }
+
+            if (devices.isEmpty() && !isLoading && errorMsg == null) {
                 Text(
                     text = "No devices registered.\nTap '+' to register this device.",
                     color = TextGray,

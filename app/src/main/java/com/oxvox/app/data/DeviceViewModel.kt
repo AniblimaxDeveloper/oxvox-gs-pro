@@ -27,6 +27,9 @@ class DeviceViewModel : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
+    private val _errorMsg = MutableStateFlow<String?>(null)
+    val errorMsg: StateFlow<String?> = _errorMsg
+
     init {
         fetchDevices()
     }
@@ -34,11 +37,12 @@ class DeviceViewModel : ViewModel() {
     fun fetchDevices() {
         viewModelScope.launch {
             _isLoading.value = true
+            _errorMsg.value = null
             try {
                 val result = supabase.postgrest["registered_devices"].select()
                 _devices.value = result.decodeList<DeviceData>()
             } catch (e: Exception) {
-                e.printStackTrace()
+                _errorMsg.value = "Gagal memuat: ${e.message}"
             } finally {
                 _isLoading.value = false
             }
@@ -48,8 +52,13 @@ class DeviceViewModel : ViewModel() {
     fun registerCurrentDevice() {
         viewModelScope.launch {
             _isLoading.value = true
+            _errorMsg.value = null
             try {
-                val userId = supabase.auth.currentUserOrNull()?.id ?: return@launch
+                val userId = supabase.auth.currentUserOrNull()?.id
+                if (userId == null) {
+                    _errorMsg.value = "User tidak ditemukan, silakan login ulang."
+                    return@launch
+                }
                 
                 val newDevice = DeviceData(
                     user_id = userId,
@@ -61,7 +70,7 @@ class DeviceViewModel : ViewModel() {
                 supabase.postgrest["registered_devices"].insert(newDevice)
                 fetchDevices() // Refresh list
             } catch (e: Exception) {
-                e.printStackTrace()
+                _errorMsg.value = "Gagal simpan: ${e.message}"
             } finally {
                 _isLoading.value = false
             }
