@@ -6,12 +6,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.oxvox.app.ui.screens.LoginScreen
 import com.oxvox.app.ui.screens.RegisterScreen
-import com.oxvox.app.ui.screens.DashboardScreen // Perbaikan Import
+import com.oxvox.app.ui.screens.DashboardScreen
+import com.oxvox.app.ui.screens.RemoteAssistanceScreen
 
 sealed class Screen(val route: String) {
     object Login : Screen("login")
     object Register : Screen("register")
     object Dashboard : Screen("dashboard")
+    object RemoteAssist : Screen("remote_assist")
 }
 
 @Composable
@@ -19,7 +21,7 @@ fun OXVOXNavGraph(navController: NavHostController) {
     NavHost(navController = navController, startDestination = Screen.Login.route) {
         composable(Screen.Login.route) {
             LoginScreen(
-                onLoginSuccess = { navController.navigate(Screen.Dashboard.route) },
+                onLoginSuccess = { navController.navigate(Screen.Dashboard.route) { popUpTo(Screen.Login.route) { inclusive = true } } },
                 onNavigateToRegister = { navController.navigate(Screen.Register.route) }
             )
         }
@@ -30,7 +32,14 @@ fun OXVOXNavGraph(navController: NavHostController) {
             )
         }
         composable(Screen.Dashboard.route) {
-            DashboardScreen()
+            DashboardScreen(
+                onNavigateToRemote = { navController.navigate(Screen.RemoteAssist.route) }
+            )
+        }
+        composable(Screen.RemoteAssist.route) {
+            RemoteAssistanceScreen(
+                onBack = { navController.popBackStack() }
+            )
         }
     }
 }

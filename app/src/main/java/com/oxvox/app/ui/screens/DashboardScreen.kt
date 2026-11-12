@@ -24,11 +24,16 @@ import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
 import com.oxvox.app.data.DeviceData
 import com.oxvox.app.data.DeviceViewModel
+import com.oxvox.app.data.RemoteSessionViewModel
 import com.oxvox.app.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DashboardScreen(viewModel: DeviceViewModel = viewModel()) {
+fun DashboardScreen(
+    onNavigateToRemote: () -> Unit,
+    viewModel: DeviceViewModel = viewModel(),
+    remoteViewModel: RemoteSessionViewModel = viewModel()
+) {
     val devices by viewModel.devices.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val errorMsg by viewModel.errorMsg.collectAsState()
@@ -36,7 +41,6 @@ fun DashboardScreen(viewModel: DeviceViewModel = viewModel()) {
     
     var selectedDeviceId by remember { mutableStateOf<String?>(null) }
 
-    // Launcher untuk Scanner QR
     val scanLauncher = rememberLauncherForActivityResult(contract = ScanContract()) { result ->
         if (result.contents != null) {
             viewModel.linkDevice(result.contents)
@@ -50,8 +54,7 @@ fun DashboardScreen(viewModel: DeviceViewModel = viewModel()) {
                 TopAppBar(
                     title = { Text("OXVOX // COMMAND", color = NeonCyan, fontFamily = FontFamily.Monospace, fontSize = 16.sp) },
                     actions = {
-                        // Tombol Scan QR di Top Bar
-                        TextButton(onClick = {
+                        TextButton(onClick = { 
                             val options = ScanOptions()
                             options.setDesiredBarcodeFormats(ScanOptions.QR_CODE)
                             options.setPrompt("SCAN OXVOX NODE")
@@ -59,7 +62,10 @@ fun DashboardScreen(viewModel: DeviceViewModel = viewModel()) {
                             options.setOrientationLocked(true)
                             scanLauncher.launch(options)
                         }) {
-                            Text("[SCAN QR]", color = ComicPurple, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
+                            Text("[SCAN]", color = ComicPurple, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
+                        }
+                        TextButton(onClick = onNavigateToRemote) {
+                            Text("[X-ASSIST]", color = NeonCyan, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = VillainBlack.copy(alpha = 0.8f))
@@ -67,29 +73,17 @@ fun DashboardScreen(viewModel: DeviceViewModel = viewModel()) {
             },
             floatingActionButton = {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    // Tombol Refresh
-                    FloatingActionButton(
-                        onClick = { viewModel.fetchDevices() },
-                        containerColor = VillainDarkGray,
-                        contentColor = NeonCyan
-                    ) {
+                    FloatingActionButton(onClick = { viewModel.fetchDevices() }, containerColor = VillainDarkGray, contentColor = NeonCyan) {
                         Text("↻", fontSize = 20.sp, fontWeight = FontWeight.Bold)
                     }
-                    // Tombol Tambah
-                    FloatingActionButton(
-                        onClick = { viewModel.registerCurrentDevice() },
-                        containerColor = ComicPurple,
-                        contentColor = TextWhite
-                    ) {
+                    FloatingActionButton(onClick = { viewModel.registerCurrentDevice() }, containerColor = ComicPurple, contentColor = TextWhite) {
                         Text("+", fontSize = 24.sp, fontWeight = FontWeight.Bold)
                     }
                 }
             },
             containerColor = androidx.compose.ui.graphics.Color.Transparent
         ) { paddingValues ->
-            Column(
-                modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp)
-            ) {
+            Column(modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -105,29 +99,14 @@ fun DashboardScreen(viewModel: DeviceViewModel = viewModel()) {
 
                 HorizontalDivider(color = NeonCyan.copy(alpha = 0.3f), modifier = Modifier.padding(bottom = 16.dp))
 
-                if (isLoading) {
-                    CircularProgressIndicator(color = NeonCyan, modifier = Modifier.align(Alignment.CenterHorizontally))
-                }
-
-                if (errorMsg != null) {
-                    Text(
-                        text = "> $errorMsg",
-                        color = BloodRed,
-                        fontFamily = FontFamily.Monospace,
-                        modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 16.dp)
-                    )
-                }
+                if (isLoading) CircularProgressIndicator(color = NeonCyan, modifier = Modifier.align(Alignment.CenterHorizontally))
+                if (errorMsg != null) Text("> $errorMsg", color = BloodRed, fontFamily = FontFamily.Monospace, modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 16.dp))
 
                 Text("ACTIVE NODES", color = TextWhite, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(8.dp))
 
                 if (devices.isEmpty() && !isLoading && errorMsg == null) {
-                    Text(
-                        text = "> No devices connected.\n> Tap '+' to initialize node.",
-                        color = TextGray,
-                        fontFamily = FontFamily.Monospace,
-                        fontSize = 12.sp
-                    )
+                    Text("> No devices connected.\n> Tap '+' to initialize node.", color = TextGray, fontFamily = FontFamily.Monospace, fontSize = 12.sp)
                 }
 
                 LazyColumn {
@@ -135,7 +114,8 @@ fun DashboardScreen(viewModel: DeviceViewModel = viewModel()) {
                         CyberDeviceCard(
                             device = device,
                             onQrClick = { selectedDeviceId = device.id },
-                            onDeleteClick = { viewModel.deleteDevice(device.id!!) }
+                            onDeleteClick = { viewModel.deleteDevice(device.id!!) },
+                            onHelpClick = { remoteViewModel.requestRemoteSession(device.id!!) }
                         )
                     }
                 }
@@ -143,27 +123,20 @@ fun DashboardScreen(viewModel: DeviceViewModel = viewModel()) {
         }
         
         if (selectedDeviceId != null) {
-            QrCodeDialog(
-                deviceId = selectedDeviceId!!,
-                onDismiss = { selectedDeviceId = null }
-            )
+            QrCodeDialog(deviceId = selectedDeviceId!!, onDismiss = { selectedDeviceId = null })
         }
     }
 }
 
 @Composable
-fun CyberDeviceCard(device: DeviceData, onQrClick: () -> Unit, onDeleteClick: () -> Unit) {
+fun CyberDeviceCard(device: DeviceData, onQrClick: () -> Unit, onDeleteClick: () -> Unit, onHelpClick: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
         colors = CardDefaults.cardColors(containerColor = VillainDarkGray.copy(alpha = 0.9f)),
         shape = RoundedCornerShape(4.dp),
         border = BorderStroke(1.dp, NeonCyan.copy(alpha = 0.5f))
     ) {
-        Row(
-            modifier = Modifier.padding(16.dp).fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        Row(modifier = Modifier.padding(16.dp).fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(device.device_name, color = NeonCyan, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
                 Spacer(modifier = Modifier.height(4.dp))
@@ -172,30 +145,21 @@ fun CyberDeviceCard(device: DeviceData, onQrClick: () -> Unit, onDeleteClick: ()
                 Text("ID: ${device.id?.take(8)}...", color = TextGray, fontSize = 10.sp, fontFamily = FontFamily.Monospace)
             }
             
-            // Tombol Aksi (QR & Hapus)
-            Column(horizontalAlignment = Alignment.End) {
+            Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                // Tombol Help (Remote Assist)
                 Box(
-                    modifier = Modifier
-                        .background(ComicPurple.copy(alpha = 0.2f), RoundedCornerShape(4.dp))
-                        .border(1.dp, ComicPurple, RoundedCornerShape(4.dp))
-                        .clickable { onQrClick() }
-                        .padding(horizontal = 12.dp, vertical = 6.dp),
+                    modifier = Modifier.background(NeonCyan.copy(alpha = 0.2f), RoundedCornerShape(4.dp)).border(1.dp, NeonCyan, RoundedCornerShape(4.dp)).clickable { onHelpClick() }.padding(horizontal = 12.dp, vertical = 6.dp),
                     contentAlignment = Alignment.Center
-                ) {
-                    Text("QR", color = NeonCyan, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
-                }
-                
-                Spacer(modifier = Modifier.height(8.dp))
-                
-                Box(
-                    modifier = Modifier
-                        .background(BloodRed.copy(alpha = 0.2f), RoundedCornerShape(4.dp))
-                        .border(1.dp, BloodRed, RoundedCornerShape(4.dp))
-                        .clickable { onDeleteClick() }
-                        .padding(horizontal = 12.dp, vertical = 6.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("DEL", color = BloodRed, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
+                ) { Text("HELP", color = NeonCyan, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace) }
+
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Box(
+                        modifier = Modifier.background(ComicPurple.copy(alpha = 0.2f), RoundedCornerShape(4.dp)).border(1.dp, ComicPurple, RoundedCornerShape(4.dp)).clickable { onQrClick() }.padding(horizontal = 8.dp, vertical = 4.dp)
+                    ) { Text("QR", color = ComicPurple, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace, fontSize = 12.sp) }
+                    
+                    Box(
+                        modifier = Modifier.background(BloodRed.copy(alpha = 0.2f), RoundedCornerShape(4.dp)).border(1.dp, BloodRed, RoundedCornerShape(4.dp)).clickable { onDeleteClick() }.padding(horizontal = 8.dp, vertical = 4.dp)
+                    ) { Text("DEL", color = BloodRed, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace, fontSize = 12.sp) }
                 }
             }
         }
