@@ -10,11 +10,10 @@ val supabase = createSupabaseClient(
     supabaseUrl = BuildConfig.SUPABASE_URL,
     supabaseKey = BuildConfig.SUPABASE_ANON_KEY
 ) {
-    install(Auth)
-    install(Postgrest)
-    
-    // Perbaikan: Abaikan kolom database yang tidak ada di Kotlin
     defaultSerializer = Json { 
         ignoreUnknownKeys = true 
+        isLenient = true
     }
+    install(Auth)
+    install(Postgrest)
 }

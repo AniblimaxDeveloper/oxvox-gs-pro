@@ -17,7 +17,9 @@ data class DeviceData(
     val device_name: String,
     val device_model: String,
     val android_version: String,
-    val connection_status: String = "Online"
+    val connection_status: String = "Online",
+    val last_active: String? = null, // Tambahan agar cocok dengan DB
+    val created_at: String? = null   // Tambahan agar cocok dengan DB
 )
 
 class DeviceViewModel : ViewModel() {
@@ -42,7 +44,7 @@ class DeviceViewModel : ViewModel() {
                 val result = supabase.postgrest["registered_devices"].select()
                 _devices.value = result.decodeList<DeviceData>()
             } catch (e: Exception) {
-                _errorMsg.value = "Gagal memuat: ${e.message}"
+                _errorMsg.value = e.message
             } finally {
                 _isLoading.value = false
             }
@@ -62,15 +64,15 @@ class DeviceViewModel : ViewModel() {
                 
                 val newDevice = DeviceData(
                     user_id = userId,
-                    device_name = "OXVOX Device",
+                    device_name = "OXVOX Node",
                     device_model = "${Build.MANUFACTURER} ${Build.MODEL}",
                     android_version = "Android ${Build.VERSION.RELEASE}"
                 )
                 
                 supabase.postgrest["registered_devices"].insert(newDevice)
-                fetchDevices() // Refresh list
+                fetchDevices()
             } catch (e: Exception) {
-                _errorMsg.value = "Gagal simpan: ${e.message}"
+                _errorMsg.value = e.message
             } finally {
                 _isLoading.value = false
             }
