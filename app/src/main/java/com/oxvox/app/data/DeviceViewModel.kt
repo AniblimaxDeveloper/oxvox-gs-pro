@@ -18,8 +18,8 @@ data class DeviceData(
     val device_model: String,
     val android_version: String,
     val connection_status: String = "Online",
-    val last_active: String? = null, // Tambahan agar cocok dengan DB
-    val created_at: String? = null   // Tambahan agar cocok dengan DB
+    val last_active: String? = null,
+    val created_at: String? = null
 )
 
 class DeviceViewModel : ViewModel() {
@@ -56,19 +56,13 @@ class DeviceViewModel : ViewModel() {
             _isLoading.value = true
             _errorMsg.value = null
             try {
-                val userId = supabase.auth.currentUserOrNull()?.id
-                if (userId == null) {
-                    _errorMsg.value = "User tidak ditemukan, silakan login ulang."
-                    return@launch
-                }
-                
+                val userId = supabase.auth.currentUserOrNull()?.id ?: return@launch
                 val newDevice = DeviceData(
                     user_id = userId,
                     device_name = "OXVOX Node",
                     device_model = "${Build.MANUFACTURER} ${Build.MODEL}",
                     android_version = "Android ${Build.VERSION.RELEASE}"
                 )
-                
                 supabase.postgrest["registered_devices"].insert(newDevice)
                 fetchDevices()
             } catch (e: Exception) {
@@ -76,6 +70,32 @@ class DeviceViewModel : ViewModel() {
             } finally {
                 _isLoading.value = false
             }
+        }
+    }
+
+    // FITUR BARU: Hapus Perangkat
+    fun deleteDevice(deviceId: String) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                supabase.postgrest["registered_devices"].delete {
+                    filter { eq("id", deviceId) }
+                }
+                fetchDevices()
+            } catch (e: Exception) {
+                _errorMsg.value = "Gagal menghapus: ${e.message}"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    // FITUR BARU: Pairing via QR (Simulasi Link)
+    fun linkDevice(targetId: String) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            _errorMsg.value = "Berhasil memindai Node: ${targetId.take(8)}... (Fitur Link disiapkan)"
+            _isLoading.value = false
         }
     }
 }
