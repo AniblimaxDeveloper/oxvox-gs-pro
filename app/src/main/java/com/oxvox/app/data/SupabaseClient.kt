@@ -4,6 +4,7 @@ import com.oxvox.app.BuildConfig
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.postgrest.Postgrest
+import kotlinx.serialization.json.Json
 
 val supabase = createSupabaseClient(
     supabaseUrl = BuildConfig.SUPABASE_URL,
@@ -11,4 +12,9 @@ val supabase = createSupabaseClient(
 ) {
     install(Auth)
     install(Postgrest)
+    
+    // Perbaikan: Abaikan kolom database yang tidak ada di Kotlin
+    defaultSerializer = Json { 
+        ignoreUnknownKeys = true 
+    }
 }
