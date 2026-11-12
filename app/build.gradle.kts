@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -15,8 +17,7 @@ android {
         versionCode = 1
         versionName = "1.0.0"
         
-        // Mengambil kunci dari local.properties (untuk Termux) atau GitHub Secrets
-        val localProperties = java.util.Properties()
+        val localProperties = Properties()
         val localPropertiesFile = rootProject.file("local.properties")
         if (localPropertiesFile.exists()) {
             localProperties.load(localPropertiesFile.inputStream())
@@ -61,7 +62,6 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation("androidx.navigation:navigation-compose:2.7.7")
     
-    // Supabase & Ktor
     implementation("io.github.jan-tennert.supabase:postgrest-kt:2.0.0")
     implementation("io.github.jan-tennert.supabase:gotrue-kt:2.0.0")
     implementation("io.ktor:ktor-client-android:2.3.7")
