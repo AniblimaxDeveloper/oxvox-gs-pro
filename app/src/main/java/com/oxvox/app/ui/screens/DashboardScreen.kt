@@ -1,6 +1,6 @@
 package com.oxvox.app.ui.screens
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,6 +11,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,52 +27,76 @@ fun DashboardScreen(viewModel: DeviceViewModel = viewModel()) {
     val isLoading by viewModel.isLoading.collectAsState()
     val errorMsg by viewModel.errorMsg.collectAsState()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("DEVICE CENTER", color = NeonCyan, fontWeight = FontWeight.Bold) },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = VillainBlack)
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { viewModel.registerCurrentDevice() },
-                containerColor = ComicPurple
+    CyberBackground {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("OXVOX // COMMAND CENTER", color = NeonCyan, fontFamily = FontFamily.Monospace, fontSize = 16.sp) },
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = VillainBlack.copy(alpha = 0.8f))
+                )
+            },
+            floatingActionButton = {
+                FloatingActionButton(
+                    onClick = { viewModel.registerCurrentDevice() },
+                    containerColor = ComicPurple,
+                    contentColor = TextWhite
+                ) {
+                    Text("+", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                }
+            },
+            containerColor = androidx.compose.ui.graphics.Color.Transparent
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(16.dp)
             ) {
-                Text("+", color = TextWhite, fontSize = 24.sp, fontWeight = FontWeight.Bold)
-            }
-        },
-        containerColor = VillainBlack
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp)
-        ) {
-            if (isLoading) {
-                CircularProgressIndicator(color = NeonCyan, modifier = Modifier.align(Alignment.CenterHorizontally))
-            }
+                // System Status Header
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text("SYSTEM ONLINE", color = NeonCyan, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
+                        Text("ENCRYPTION: ACTIVE", color = ComicPurple, fontSize = 12.sp, fontFamily = FontFamily.Monospace)
+                        Text("THREAT LEVEL: ZERO", color = BloodRed, fontSize = 12.sp, fontFamily = FontFamily.Monospace)
+                    }
+                    RadarWidget()
+                }
 
-            if (errorMsg != null) {
-                Text(
-                    text = errorMsg!!,
-                    color = BloodRed,
-                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 16.dp)
-                )
-            }
+                HorizontalDivider(color = NeonCyan.copy(alpha = 0.3f), modifier = Modifier.padding(bottom = 16.dp))
 
-            if (devices.isEmpty() && !isLoading && errorMsg == null) {
-                Text(
-                    text = "No devices registered.\nTap '+' to register this device.",
-                    color = TextGray,
-                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 32.dp)
-                )
-            }
+                if (isLoading) {
+                    CircularProgressIndicator(color = NeonCyan, modifier = Modifier.align(Alignment.CenterHorizontally))
+                }
 
-            LazyColumn {
-                items(devices) { device ->
-                    DeviceCard(device)
+                if (errorMsg != null) {
+                    Text(
+                        text = "ERROR: $errorMsg",
+                        color = BloodRed,
+                        fontFamily = FontFamily.Monospace,
+                        modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 16.dp)
+                    )
+                }
+
+                Text("ACTIVE NODES", color = TextWhite, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier.height(8.dp))
+
+                if (devices.isEmpty() && !isLoading && errorMsg == null) {
+                    Text(
+                        text = "> No devices connected.\n> Tap '+' to initialize node.",
+                        color = TextGray,
+                        fontFamily = FontFamily.Monospace,
+                        fontSize = 12.sp
+                    )
+                }
+
+                LazyColumn {
+                    items(devices) { device ->
+                        CyberDeviceCard(device)
+                    }
                 }
             }
         }
@@ -79,19 +104,22 @@ fun DashboardScreen(viewModel: DeviceViewModel = viewModel()) {
 }
 
 @Composable
-fun DeviceCard(device: DeviceData) {
+fun CyberDeviceCard(device: DeviceData) {
     Card(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-        colors = CardDefaults.cardColors(containerColor = VillainDarkGray),
-        shape = RoundedCornerShape(12.dp)
+        modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
+        colors = CardDefaults.cardColors(containerColor = VillainDarkGray.copy(alpha = 0.9f)),
+        shape = RoundedCornerShape(4.dp), // Lebih tajam ala cyberpunk
+        border = BorderStroke(1.dp, NeonCyan.copy(alpha = 0.5f))
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(device.device_name, color = NeonCyan, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(device.device_name, color = NeonCyan, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
+                Text("[ONLINE]", color = ComicPurple, fontSize = 12.sp, fontFamily = FontFamily.Monospace)
+            }
             Spacer(modifier = Modifier.height(4.dp))
-            Text(device.device_model, color = TextWhite, fontSize = 14.sp)
-            Text(device.android_version, color = TextGray, fontSize = 12.sp)
-            Spacer(modifier = Modifier.height(8.dp))
-            Text("Status: ${device.connection_status}", color = ComicPurple, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+            Text("Model: ${device.device_model}", color = TextWhite, fontSize = 12.sp, fontFamily = FontFamily.Monospace)
+            Text("OS: ${device.android_version}", color = TextGray, fontSize = 12.sp, fontFamily = FontFamily.Monospace)
+            Text("ID: ${device.id?.take(8)}...", color = TextGray, fontSize = 10.sp, fontFamily = FontFamily.Monospace)
         }
     }
 }
