@@ -1,6 +1,8 @@
 package com.oxvox.app.ui.screens
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,7 +28,6 @@ fun DashboardScreen(viewModel: DeviceViewModel = viewModel()) {
     val isLoading by viewModel.isLoading.collectAsState()
     val errorMsg by viewModel.errorMsg.collectAsState()
     
-    // State untuk menyimpan ID perangkat yang akan di-QR-kan
     var selectedDeviceId by remember { mutableStateOf<String?>(null) }
 
     CyberBackground {
@@ -94,7 +95,6 @@ fun DashboardScreen(viewModel: DeviceViewModel = viewModel()) {
                 LazyColumn {
                     items(devices) { device ->
                         CyberDeviceCard(device) {
-                            // Aksi ketika tombol QR diklik
                             selectedDeviceId = device.id
                         }
                     }
@@ -102,7 +102,6 @@ fun DashboardScreen(viewModel: DeviceViewModel = viewModel()) {
             }
         }
         
-        // Tampilkan Dialog QR jika ada perangkat yang dipilih
         if (selectedDeviceId != null) {
             QrCodeDialog(
                 deviceId = selectedDeviceId!!,
@@ -133,7 +132,6 @@ fun CyberDeviceCard(device: DeviceData, onQrClick: () -> Unit) {
                 Text("ID: ${device.id?.take(8)}...", color = TextGray, fontSize = 10.sp, fontFamily = FontFamily.Monospace)
             }
             
-            // Tombol QR Code
             Box(
                 modifier = Modifier
                     .background(ComicPurple.copy(alpha = 0.2f), RoundedCornerShape(4.dp))
