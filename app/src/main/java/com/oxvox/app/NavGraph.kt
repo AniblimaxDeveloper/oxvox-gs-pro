@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.oxvox.app.ui.screens.LoginScreen
 import com.oxvox.app.ui.screens.RegisterScreen
+import com.oxvox.app.ui.screens.DashboardScreen // Perbaikan Import
 
 sealed class Screen(val route: String) {
     object Login : Screen("login")
