@@ -30,9 +30,10 @@ import com.oxvox.app.ui.theme.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
-    onNavigateToMatrix: () -> Unit,
-    onNavigateToParental: () -> Unit,
     onNavigateToRemote: () -> Unit,
+    onNavigateToParental: () -> Unit,
+    onNavigateToMatrix: () -> Unit,
+    onNavigateToDevAdmin: () -> Unit,
     viewModel: DeviceViewModel = viewModel(),
     remoteViewModel: RemoteSessionViewModel = viewModel()
 ) {
@@ -54,7 +55,7 @@ fun DashboardScreen(
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("OXVOX // COMMAND", color = NeonCyan, fontFamily = FontFamily.Monospace, fontSize = 16.sp) },
+                    title = { Text("OXVOX // COMMAND", color = NeonCyan, fontFamily = FontFamily.Monospace, fontSize = 14.sp) },
                     actions = {
                         TextButton(onClick = { 
                             val options = ScanOptions()
@@ -63,18 +64,12 @@ fun DashboardScreen(
                             options.setBeepEnabled(false)
                             options.setOrientationLocked(true)
                             scanLauncher.launch(options)
-                        }) {
-                            Text("[SCAN]", color = ComicPurple, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
-                        }
-                        TextButton(onClick = onNavigateToRemote) {
-                            Text("[X-ASSIST]", color = NeonCyan, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
-                        }
-                        TextButton(onClick = onNavigateToParental) {
-                            Text("[PARENTAL]", color = BloodRed, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
-                        }
-                        TextButton(onClick = onNavigateToMatrix) {
-                            Text("[MATRIX]", color = NeonCyan, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
-                        }
+                        }) { Text("[SCAN]", color = ComicPurple, fontFamily = FontFamily.Monospace, fontSize = 10.sp) }
+                        
+                        TextButton(onClick = onNavigateToRemote) { Text("[X-ASSIST]", color = NeonCyan, fontFamily = FontFamily.Monospace, fontSize = 10.sp) }
+                        TextButton(onClick = onNavigateToParental) { Text("[PARENTAL]", color = BloodRed, fontFamily = FontFamily.Monospace, fontSize = 10.sp) }
+                        TextButton(onClick = onNavigateToMatrix) { Text("[MATRIX]", color = NeonCyan, fontFamily = FontFamily.Monospace, fontSize = 10.sp) }
+                        TextButton(onClick = onNavigateToDevAdmin) { Text("[DEV]", color = ComicPurple, fontFamily = FontFamily.Monospace, fontSize = 10.sp) }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = VillainBlack.copy(alpha = 0.8f))
                 )
@@ -154,7 +149,6 @@ fun CyberDeviceCard(device: DeviceData, onQrClick: () -> Unit, onDeleteClick: ()
             }
             
             Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                // Tombol Help (Remote Assist)
                 Box(
                     modifier = Modifier.background(NeonCyan.copy(alpha = 0.2f), RoundedCornerShape(4.dp)).border(1.dp, NeonCyan, RoundedCornerShape(4.dp)).clickable { onHelpClick() }.padding(horizontal = 12.dp, vertical = 6.dp),
                     contentAlignment = Alignment.Center

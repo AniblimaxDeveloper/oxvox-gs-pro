@@ -4,12 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.oxvox.app.ui.screens.LoginScreen
-import com.oxvox.app.ui.screens.RegisterScreen
-import com.oxvox.app.ui.screens.DashboardScreen
-import com.oxvox.app.ui.screens.RemoteAssistanceScreen
-import com.oxvox.app.ui.screens.ParentalControlScreen
-import com.oxvox.app.ui.screens.SystemMatrixScreen
+import com.oxvox.app.ui.screens.*
 
 sealed class Screen(val route: String) {
     object Login : Screen("login")
@@ -18,6 +13,7 @@ sealed class Screen(val route: String) {
     object RemoteAssist : Screen("remote_assist")
     object ParentalControl : Screen("parental_control")
     object SystemMatrix : Screen("system_matrix")
+    object DeveloperAdmin : Screen("developer_admin")
 }
 
 @Composable
@@ -39,21 +35,13 @@ fun OXVOXNavGraph(navController: NavHostController) {
             DashboardScreen(
                 onNavigateToRemote = { navController.navigate(Screen.RemoteAssist.route) },
                 onNavigateToParental = { navController.navigate(Screen.ParentalControl.route) },
-                onNavigateToMatrix = { navController.navigate(Screen.SystemMatrix.route) }
+                onNavigateToMatrix = { navController.navigate(Screen.SystemMatrix.route) },
+                onNavigateToDevAdmin = { navController.navigate(Screen.DeveloperAdmin.route) }
             )
         }
-        composable(Screen.SystemMatrix.route) {
-            SystemMatrixScreen(onBack = { navController.popBackStack() })
-        }
-
-        composable(Screen.ParentalControl.route) {
-            ParentalControlScreen(onBack = { navController.popBackStack() })
-        }
-
-        composable(Screen.RemoteAssist.route) {
-            RemoteAssistanceScreen(
-                onBack = { navController.popBackStack() }
-            )
-        }
+        composable(Screen.RemoteAssist.route) { RemoteAssistanceScreen(onBack = { navController.popBackStack() }) }
+        composable(Screen.ParentalControl.route) { ParentalControlScreen(onBack = { navController.popBackStack() }) }
+        composable(Screen.SystemMatrix.route) { SystemMatrixScreen(onBack = { navController.popBackStack() }) }
+        composable(Screen.DeveloperAdmin.route) { DeveloperAdminScreen(onBack = { navController.popBackStack() }) }
     }
 }
