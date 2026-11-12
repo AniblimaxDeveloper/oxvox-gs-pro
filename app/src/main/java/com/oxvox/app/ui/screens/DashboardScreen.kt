@@ -1,14 +1,13 @@
 package com.oxvox.app.ui.screens
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
@@ -26,6 +25,9 @@ fun DashboardScreen(viewModel: DeviceViewModel = viewModel()) {
     val devices by viewModel.devices.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val errorMsg by viewModel.errorMsg.collectAsState()
+    
+    // State untuk menyimpan ID perangkat yang akan di-QR-kan
+    var selectedDeviceId by remember { mutableStateOf<String?>(null) }
 
     CyberBackground {
         Scaffold(
@@ -47,12 +49,8 @@ fun DashboardScreen(viewModel: DeviceViewModel = viewModel()) {
             containerColor = androidx.compose.ui.graphics.Color.Transparent
         ) { paddingValues ->
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(16.dp)
+                modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp)
             ) {
-                // System Status Header
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -95,31 +93,57 @@ fun DashboardScreen(viewModel: DeviceViewModel = viewModel()) {
 
                 LazyColumn {
                     items(devices) { device ->
-                        CyberDeviceCard(device)
+                        CyberDeviceCard(device) {
+                            // Aksi ketika tombol QR diklik
+                            selectedDeviceId = device.id
+                        }
                     }
                 }
             }
+        }
+        
+        // Tampilkan Dialog QR jika ada perangkat yang dipilih
+        if (selectedDeviceId != null) {
+            QrCodeDialog(
+                deviceId = selectedDeviceId!!,
+                onDismiss = { selectedDeviceId = null }
+            )
         }
     }
 }
 
 @Composable
-fun CyberDeviceCard(device: DeviceData) {
+fun CyberDeviceCard(device: DeviceData, onQrClick: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
         colors = CardDefaults.cardColors(containerColor = VillainDarkGray.copy(alpha = 0.9f)),
-        shape = RoundedCornerShape(4.dp), // Lebih tajam ala cyberpunk
+        shape = RoundedCornerShape(4.dp),
         border = BorderStroke(1.dp, NeonCyan.copy(alpha = 0.5f))
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        Row(
+            modifier = Modifier.padding(16.dp).fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(device.device_name, color = NeonCyan, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
-                Text("[ONLINE]", color = ComicPurple, fontSize = 12.sp, fontFamily = FontFamily.Monospace)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text("Model: ${device.device_model}", color = TextWhite, fontSize = 12.sp, fontFamily = FontFamily.Monospace)
+                Text("OS: ${device.android_version}", color = TextGray, fontSize = 12.sp, fontFamily = FontFamily.Monospace)
+                Text("ID: ${device.id?.take(8)}...", color = TextGray, fontSize = 10.sp, fontFamily = FontFamily.Monospace)
             }
-            Spacer(modifier = Modifier.height(4.dp))
-            Text("Model: ${device.device_model}", color = TextWhite, fontSize = 12.sp, fontFamily = FontFamily.Monospace)
-            Text("OS: ${device.android_version}", color = TextGray, fontSize = 12.sp, fontFamily = FontFamily.Monospace)
-            Text("ID: ${device.id?.take(8)}...", color = TextGray, fontSize = 10.sp, fontFamily = FontFamily.Monospace)
+            
+            // Tombol QR Code
+            Box(
+                modifier = Modifier
+                    .background(ComicPurple.copy(alpha = 0.2f), RoundedCornerShape(4.dp))
+                    .border(1.dp, ComicPurple, RoundedCornerShape(4.dp))
+                    .clickable { onQrClick() }
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("QR", color = NeonCyan, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace)
+            }
         }
     }
 }
