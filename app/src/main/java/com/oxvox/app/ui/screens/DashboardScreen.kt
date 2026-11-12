@@ -30,6 +30,7 @@ import com.oxvox.app.ui.theme.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
+    onNavigateToCore: () -> Unit,
     onNavigateToRemote: () -> Unit,
     onNavigateToParental: () -> Unit,
     onNavigateToMatrix: () -> Unit,
@@ -69,7 +70,10 @@ fun DashboardScreen(
                         TextButton(onClick = onNavigateToRemote) { Text("[X-ASSIST]", color = NeonCyan, fontFamily = FontFamily.Monospace, fontSize = 10.sp) }
                         TextButton(onClick = onNavigateToParental) { Text("[PARENTAL]", color = BloodRed, fontFamily = FontFamily.Monospace, fontSize = 10.sp) }
                         TextButton(onClick = onNavigateToMatrix) { Text("[MATRIX]", color = NeonCyan, fontFamily = FontFamily.Monospace, fontSize = 10.sp) }
-                        TextButton(onClick = onNavigateToDevAdmin) { Text("[DEV]", color = ComicPurple, fontFamily = FontFamily.Monospace, fontSize = 10.sp) }
+                        TextButton(onClick = onNavigateToDevAdmin) { Text("[DEV]", color = ComicPurple, fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+                        }
+                        TextButton(onClick = onNavigateToCore) {
+                            Text("[CORE]", color = BloodRed, fontFamily = FontFamily.Monospace, fontSize = 10.sp, fontWeight = FontWeight.Bold) }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = VillainBlack.copy(alpha = 0.8f))
                 )

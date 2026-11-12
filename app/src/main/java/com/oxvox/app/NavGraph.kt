@@ -14,6 +14,7 @@ sealed class Screen(val route: String) {
     object ParentalControl : Screen("parental_control")
     object SystemMatrix : Screen("system_matrix")
     object DeveloperAdmin : Screen("developer_admin")
+    object CoreSystem : Screen("core_system")
 }
 
 @Composable
@@ -36,12 +37,17 @@ fun OXVOXNavGraph(navController: NavHostController) {
                 onNavigateToRemote = { navController.navigate(Screen.RemoteAssist.route) },
                 onNavigateToParental = { navController.navigate(Screen.ParentalControl.route) },
                 onNavigateToMatrix = { navController.navigate(Screen.SystemMatrix.route) },
-                onNavigateToDevAdmin = { navController.navigate(Screen.DeveloperAdmin.route) }
+                onNavigateToDevAdmin = { navController.navigate(Screen.DeveloperAdmin.route) },
+                onNavigateToCore = { navController.navigate(Screen.CoreSystem.route) }
             )
         }
         composable(Screen.RemoteAssist.route) { RemoteAssistanceScreen(onBack = { navController.popBackStack() }) }
         composable(Screen.ParentalControl.route) { ParentalControlScreen(onBack = { navController.popBackStack() }) }
         composable(Screen.SystemMatrix.route) { SystemMatrixScreen(onBack = { navController.popBackStack() }) }
+        composable(Screen.CoreSystem.route) {
+            CoreSystemScreen(onBack = { navController.popBackStack() })
+        }
+
         composable(Screen.DeveloperAdmin.route) { DeveloperAdminScreen(onBack = { navController.popBackStack() }) }
     }
 }
