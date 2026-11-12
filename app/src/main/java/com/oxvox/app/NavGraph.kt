@@ -9,6 +9,7 @@ import com.oxvox.app.ui.screens.RegisterScreen
 import com.oxvox.app.ui.screens.DashboardScreen
 import com.oxvox.app.ui.screens.RemoteAssistanceScreen
 import com.oxvox.app.ui.screens.ParentalControlScreen
+import com.oxvox.app.ui.screens.SystemMatrixScreen
 
 sealed class Screen(val route: String) {
     object Login : Screen("login")
@@ -16,6 +17,7 @@ sealed class Screen(val route: String) {
     object Dashboard : Screen("dashboard")
     object RemoteAssist : Screen("remote_assist")
     object ParentalControl : Screen("parental_control")
+    object SystemMatrix : Screen("system_matrix")
 }
 
 @Composable
@@ -36,9 +38,14 @@ fun OXVOXNavGraph(navController: NavHostController) {
         composable(Screen.Dashboard.route) {
             DashboardScreen(
                 onNavigateToRemote = { navController.navigate(Screen.RemoteAssist.route) },
-                onNavigateToParental = { navController.navigate(Screen.ParentalControl.route) }
+                onNavigateToParental = { navController.navigate(Screen.ParentalControl.route) },
+                onNavigateToMatrix = { navController.navigate(Screen.SystemMatrix.route) }
             )
         }
+        composable(Screen.SystemMatrix.route) {
+            SystemMatrixScreen(onBack = { navController.popBackStack() })
+        }
+
         composable(Screen.ParentalControl.route) {
             ParentalControlScreen(onBack = { navController.popBackStack() })
         }

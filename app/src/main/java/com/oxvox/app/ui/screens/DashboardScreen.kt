@@ -30,6 +30,7 @@ import com.oxvox.app.ui.theme.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
+    onNavigateToMatrix: () -> Unit,
     onNavigateToParental: () -> Unit,
     onNavigateToRemote: () -> Unit,
     viewModel: DeviceViewModel = viewModel(),
@@ -70,6 +71,9 @@ fun DashboardScreen(
                         }
                         TextButton(onClick = onNavigateToParental) {
                             Text("[PARENTAL]", color = BloodRed, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
+                        }
+                        TextButton(onClick = onNavigateToMatrix) {
+                            Text("[MATRIX]", color = NeonCyan, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = VillainBlack.copy(alpha = 0.8f))
