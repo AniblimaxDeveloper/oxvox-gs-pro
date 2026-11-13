@@ -13,16 +13,22 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
+import com.oxvox.app.R
 import com.oxvox.app.data.DeviceData
 import com.oxvox.app.data.DeviceViewModel
 import com.oxvox.app.data.RemoteSessionViewModel
@@ -86,12 +92,25 @@ fun DashboardScreen(
         ) { paddingValues ->
             Column(modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp)) {
                 
-                // HERO ANIME SECTION (Diganti Box Warna Solid Sementara)
+                // HERO ANIME GIF SECTION (Menggunakan Coil AsyncImage)
                 Box(
-                    modifier = Modifier.fillMaxWidth().height(100.dp).clip(RoundedCornerShape(8.dp)).border(2.dp, BloodRed, RoundedCornerShape(8.dp)).background(ComicPurpleDark),
-                    contentAlignment = Alignment.Center
+                    modifier = Modifier.fillMaxWidth().height(180.dp).clip(RoundedCornerShape(8.dp)).border(2.dp, BloodRed, RoundedCornerShape(8.dp)),
+                    contentAlignment = Alignment.BottomCenter
                 ) {
-                    Text("PROTOCOL: ALPHA", color = BloodRed, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold, fontSize = 24.sp)
+                    Box(modifier = Modifier.fillMaxSize().background(ComicPurpleDark))
+                    
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(R.drawable.hero_anime)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = "Villain GIF",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize().alpha(0.7f)
+                    )
+                    
+                    Box(modifier = Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(Color.Transparent, VoidBlack))))
+                    Text("PROTOCOL: ALPHA", color = BloodRed, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold, fontSize = 20.sp, modifier = Modifier.padding(bottom = 8.dp))
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
