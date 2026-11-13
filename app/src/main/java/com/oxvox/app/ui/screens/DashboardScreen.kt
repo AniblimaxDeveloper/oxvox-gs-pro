@@ -92,21 +92,18 @@ fun DashboardScreen(
         ) { paddingValues ->
             Column(modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp)) {
                 
-                // HERO ANIME SECTION
+                // HERO ANIME SECTION (Tanpa onError)
                 Box(
                     modifier = Modifier.fillMaxWidth().height(180.dp).clip(RoundedCornerShape(8.dp)).border(2.dp, BloodRed, RoundedCornerShape(8.dp)),
                     contentAlignment = Alignment.BottomCenter
                 ) {
-                    // Kita gunakan Box berwarna solid untuk mencegah crash jika gambar gagal dimuat
                     Box(modifier = Modifier.fillMaxSize().background(ComicPurpleDark))
                     
-                    // Coba muat gambar
                     Image(
                         painter = painterResource(id = R.drawable.hero_anime),
                         contentDescription = "Villain Character",
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize().alpha(0.7f),
-                        onError = { /* Abaikan jika gambar error */ }
+                        modifier = Modifier.fillMaxSize().alpha(0.7f)
                     )
                     
                     Box(modifier = Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(Color.Transparent, VoidBlack))))
