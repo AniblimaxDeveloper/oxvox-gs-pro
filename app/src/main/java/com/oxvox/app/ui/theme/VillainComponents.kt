@@ -21,10 +21,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlin.random.Random
 
-// Data bintang yang disimpan di memori (Tidak di-render ulang terus menerus)
 data class StarData(val x: Float, val y: Float, val radius: Float, val isRed: Boolean)
 
-// 1. Teks Glitch yang lebih ringan
 @Composable
 fun GlitchText(text: String, color: Color = NeonCyan, fontSize: Int = 16) {
     val infiniteTransition = rememberInfiniteTransition(label = "glitch")
@@ -34,32 +32,17 @@ fun GlitchText(text: String, color: Color = NeonCyan, fontSize: Int = 16) {
     )
 
     Box(contentAlignment = Alignment.Center) {
-        Text(
-            text = text, color = BloodRed,
-            fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold, fontSize = fontSize.sp,
-            modifier = Modifier.graphicsLayer { translationX = offsetX }
-        )
-        Text(
-            text = text, color = Color.Cyan,
-            fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold, fontSize = fontSize.sp,
-            modifier = Modifier.graphicsLayer { translationX = -offsetX }
-        )
+        Text(text = text, color = BloodRed, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold, fontSize = fontSize.sp, modifier = Modifier.graphicsLayer { translationX = offsetX })
+        Text(text = text, color = Color.Cyan, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold, fontSize = fontSize.sp, modifier = Modifier.graphicsLayer { translationX = -offsetX })
         Text(text = text, color = color, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold, fontSize = fontSize.sp)
     }
 }
 
-// 2. Latar Belakang Galaksi yang sudah dioptimalkan
 @Composable
 fun HorrorGalaxyBackground(content: @Composable () -> Unit) {
-    // Simpan data bintang di remember agar tidak dibuat ulang setiap frame
     val stars = remember {
-        List(60) {
-            StarData(
-                x = Random.nextFloat(),
-                y = Random.nextFloat(),
-                radius = Random.nextFloat() * 2f + 1f,
-                isRed = it % 4 == 0
-            )
+        List(40) {
+            StarData(x = Random.nextFloat(), y = Random.nextFloat(), radius = Random.nextFloat() * 2f + 1f, isRed = it % 4 == 0)
         }
     }
     
@@ -69,7 +52,7 @@ fun HorrorGalaxyBackground(content: @Composable () -> Unit) {
         animationSpec = infiniteRepeatable(tween(2000, easing = LinearEasing), RepeatMode.Reverse), label = "pulse"
     )
 
-    Box(modifier = Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(VoidBlack, ComicPurpleDark.copy(alpha = 0.3f), VoidBlack)))) {
+    Box(modifier = Modifier.fillMaxSize().background(VoidBlack)) {
         Canvas(modifier = Modifier.fillMaxSize()) {
             stars.forEach { star ->
                 drawCircle(
@@ -83,7 +66,6 @@ fun HorrorGalaxyBackground(content: @Composable () -> Unit) {
     }
 }
 
-// 3. Kartu Bergaya Komik Gelap
 @Composable
 fun VillainCard(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     Box(
