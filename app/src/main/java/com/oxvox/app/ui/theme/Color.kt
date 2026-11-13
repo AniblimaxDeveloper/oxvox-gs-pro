@@ -1,10 +1,16 @@
 package com.oxvox.app.ui.theme
 import androidx.compose.ui.graphics.Color
 
-val VillainBlack = Color(0xFF0B0B0C)
-val VillainDarkGray = Color(0xFF1A1A1F)
-val ComicPurple = Color(0xFF6A0DAD)
+val VoidBlack = Color(0xFF050505)
+val BloodCrimson = Color(0xFF8A0303)
+val ToxicGreen = Color(0xFF39FF14)
+val PhantomPurple = Color(0xFF4B0082)
+val BoneWhite = Color(0xFFE5E5E5)
 val NeonCyan = Color(0xFF00F0FF)
-val BloodRed = Color(0xFFFF003C)
-val TextWhite = Color(0xFFF0F0F0)
-val TextGray = Color(0xFFA0A0A0) // Tambahan untuk Phase 2
+val ComicPurple = Color(0xFF6A0DAD)
+val VillainBlack = VoidBlack
+val VillainDarkGray = Color(0xFF121212)
+val ComicPurpleDark = Color(0xFF2A004D)
+val TextWhite = BoneWhite
+val TextGray = Color(0xFF888888)
+val BloodRed = BloodCrimson
