@@ -2,7 +2,6 @@ package com.oxvox.app.ui.screens
 
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -10,7 +9,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -44,7 +42,7 @@ fun DashboardScreen(
     onNavigateToMatrix: () -> Unit,
     onNavigateToDevAdmin: () -> Unit,
     onNavigateToCore: () -> Unit,
-    onNavigateToVillainMode: () -> Unit, // Fitur Baru
+    onNavigateToVillainMode: () -> Unit,
     viewModel: DeviceViewModel = viewModel(),
     remoteViewModel: RemoteSessionViewModel = viewModel()
 ) {
@@ -85,13 +83,7 @@ fun DashboardScreen(
             },
             floatingActionButton = {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    // Tombol Villain Mode (Merah Menyala)
-                    FloatingActionButton(
-                        onClick = onNavigateToVillainMode,
-                        containerColor = BloodCrimson,
-                        contentColor = Color.White
-                    ) { Text("☠", fontSize = 20.sp, fontWeight = FontWeight.Bold) }
-                    
+                    FloatingActionButton(onClick = onNavigateToVillainMode, containerColor = BloodCrimson, contentColor = Color.White) { Text("☠", fontSize = 20.sp, fontWeight = FontWeight.Bold) }
                     FloatingActionButton(onClick = { viewModel.fetchDevices() }, containerColor = VillainDarkGray, contentColor = NeonCyan) { Text("↻", fontSize = 20.sp) }
                     FloatingActionButton(onClick = { viewModel.registerCurrentDevice() }, containerColor = ComicPurple, contentColor = Color.White) { Text("+", fontSize = 24.sp) }
                 }
@@ -100,18 +92,23 @@ fun DashboardScreen(
         ) { paddingValues ->
             Column(modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp)) {
                 
-                // HERO ANIME SECTION (Karakter Anda)
+                // HERO ANIME SECTION
                 Box(
                     modifier = Modifier.fillMaxWidth().height(180.dp).clip(RoundedCornerShape(8.dp)).border(2.dp, BloodRed, RoundedCornerShape(8.dp)),
                     contentAlignment = Alignment.BottomCenter
                 ) {
-                    // Pastikan file hero_anime.jpg ada di folder drawable
+                    // Kita gunakan Box berwarna solid untuk mencegah crash jika gambar gagal dimuat
+                    Box(modifier = Modifier.fillMaxSize().background(ComicPurpleDark))
+                    
+                    // Coba muat gambar
                     Image(
                         painter = painterResource(id = R.drawable.hero_anime),
                         contentDescription = "Villain Character",
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize().alpha(0.7f)
+                        modifier = Modifier.fillMaxSize().alpha(0.7f),
+                        onError = { /* Abaikan jika gambar error */ }
                     )
+                    
                     Box(modifier = Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(Color.Transparent, VoidBlack))))
                     Text("PROTOCOL: ALPHA", color = BloodRed, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold, fontSize = 20.sp, modifier = Modifier.padding(bottom = 8.dp))
                 }
