@@ -5,9 +5,11 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -63,22 +65,9 @@ fun DashboardScreen(
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { GlitchText("OXVOX // SYSTEM COMPROMISED", fontSize = 14) },
-                    actions = {
-                        TextButton(onClick = { 
-                            val options = ScanOptions()
-                            options.setDesiredBarcodeFormats(ScanOptions.QR_CODE)
-                            options.setPrompt("SCAN OXVOX NODE")
-                            options.setBeepEnabled(false)
-                            scanLauncher.launch(options)
-                        }) { Text("[SCAN]", color = ToxicGreen, fontFamily = FontFamily.Monospace, fontSize = 10.sp) }
-                        TextButton(onClick = onNavigateToRemote) { Text("[ASSIST]", color = BloodRed, fontFamily = FontFamily.Monospace, fontSize = 10.sp) }
-                        TextButton(onClick = onNavigateToParental) { Text("[FAMILY]", color = ComicPurple, fontFamily = FontFamily.Monospace, fontSize = 10.sp) }
-                        TextButton(onClick = onNavigateToMatrix) { Text("[MATRIX]", color = NeonCyan, fontFamily = FontFamily.Monospace, fontSize = 10.sp) }
-                        TextButton(onClick = onNavigateToDevAdmin) { Text("[DEV]", color = BoneWhite, fontFamily = FontFamily.Monospace, fontSize = 10.sp) }
-                        TextButton(onClick = onNavigateToCore) { Text("[CORE]", color = BloodRed, fontFamily = FontFamily.Monospace, fontSize = 10.sp) }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(containerColor = VoidBlack.copy(alpha = 0.9f))
+                    // Judul dipersingkat agar tidak terpotong
+                    title = { GlitchText("OXVOX // ALPHA", fontSize = 16) },
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
                 )
             },
             floatingActionButton = {
@@ -90,9 +79,28 @@ fun DashboardScreen(
             },
             containerColor = Color.Transparent
         ) { paddingValues ->
-            Column(modifier = Modifier.fillMaxSize().padding(paddingValues).padding(16.dp)) {
+            Column(modifier = Modifier.fillMaxSize().padding(paddingValues).padding(horizontal = 16.dp)) {
                 
-                // HERO ANIME GIF SECTION (Menggunakan Coil AsyncImage)
+                // Menu Navigasi Horizontal (Bisa digeser)
+                Row(
+                    modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(vertical = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    TextButton(onClick = { 
+                        val options = ScanOptions()
+                        options.setDesiredBarcodeFormats(ScanOptions.QR_CODE)
+                        options.setPrompt("SCAN OXVOX NODE")
+                        options.setBeepEnabled(false)
+                        scanLauncher.launch(options)
+                    }) { Text("[SCAN]", color = ToxicGreen, fontFamily = FontFamily.Monospace, fontSize = 12.sp) }
+                    TextButton(onClick = onNavigateToRemote) { Text("[ASSIST]", color = BloodRed, fontFamily = FontFamily.Monospace, fontSize = 12.sp) }
+                    TextButton(onClick = onNavigateToParental) { Text("[FAMILY]", color = ComicPurple, fontFamily = FontFamily.Monospace, fontSize = 12.sp) }
+                    TextButton(onClick = onNavigateToMatrix) { Text("[MATRIX]", color = NeonCyan, fontFamily = FontFamily.Monospace, fontSize = 12.sp) }
+                    TextButton(onClick = onNavigateToDevAdmin) { Text("[DEV]", color = BoneWhite, fontFamily = FontFamily.Monospace, fontSize = 12.sp) }
+                    TextButton(onClick = onNavigateToCore) { Text("[CORE]", color = BloodRed, fontFamily = FontFamily.Monospace, fontSize = 12.sp) }
+                }
+
+                // HERO ANIME GIF SECTION
                 Box(
                     modifier = Modifier.fillMaxWidth().height(180.dp).clip(RoundedCornerShape(8.dp)).border(2.dp, BloodRed, RoundedCornerShape(8.dp)),
                     contentAlignment = Alignment.BottomCenter
@@ -106,17 +114,16 @@ fun DashboardScreen(
                             .build(),
                         contentDescription = "Villain GIF",
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize().alpha(0.7f)
+                        modifier = Modifier.fillMaxSize()
                     )
                     
-                    Box(modifier = Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(Color.Transparent, VoidBlack))))
+                    // Gradasi gelap hanya di bagian bawah teks
+                    Box(modifier = Modifier.fillMaxWidth().height(60.dp).background(Brush.verticalGradient(listOf(Color.Transparent, VoidBlack))))
                     Text("PROTOCOL: ALPHA", color = BloodRed, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold, fontSize = 20.sp, modifier = Modifier.padding(bottom = 8.dp))
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
-                HorizontalDivider(color = BloodCrimson.copy(alpha = 0.5f))
-                Spacer(modifier = Modifier.height(16.dp))
-
+                
                 if (isLoading) CircularProgressIndicator(color = BloodRed, modifier = Modifier.align(Alignment.CenterHorizontally))
                 if (errorMsg != null) Text("> $errorMsg", color = BloodRed, fontFamily = FontFamily.Monospace, modifier = Modifier.align(Alignment.CenterHorizontally))
 
